@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Garden Pruning Master Guide & Planner</title>
+  <title>Garden Pruning Calendar & Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -12,71 +12,129 @@
       border-color: #10b981;
       background-color: #f8fdfa;
     }
+    .month-btn.active-month {
+      ring-width: 2px;
+      transform: scale(1.05);
+      font-weight: 800;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
 
-  <!-- Sticky App Header -->
-  <header class="bg-emerald-900 text-white shadow-md sticky top-0 z-50">
+  <!-- Header -->
+  <header class="bg-emerald-950 text-white shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
       <div>
         <h1 class="text-xl md:text-2xl font-extrabold tracking-tight flex items-center gap-2">
-          <i class="fa-solid fa-scissors text-emerald-400"></i> Garden Pruning Master Planner
+          <i class="fa-solid fa-calendar-check text-emerald-400"></i> Garden Pruning Calendar & Planner
         </h1>
-        <p class="text-xs text-emerald-200">Verified plant-by-plant instructions mapped directly to your photos</p>
+        <p class="text-xs text-emerald-300/80" id="header-subtitle">Dynamic seasonal schedule</p>
       </div>
 
-      <!-- Live Progress Bar -->
-      <div class="bg-emerald-950/70 p-2.5 px-4 rounded-xl flex items-center gap-4 border border-emerald-700/60 w-full md:w-auto">
-        <div class="text-xs md:text-sm">
-          <span class="font-medium text-emerald-200">Completed:</span>
-          <span id="progress-text" class="font-bold text-white ml-1">0 / 0</span>
-        </div>
-        <div class="w-32 md:w-44 bg-emerald-950 rounded-full h-2.5 overflow-hidden border border-emerald-700">
-          <div id="progress-bar" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
+      <!-- Live Progress & Reset -->
+      <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+        <div class="bg-emerald-900/80 px-4 py-2 rounded-xl flex items-center gap-3 border border-emerald-700/60">
+          <div class="text-xs">
+            <span class="text-emerald-200">Done:</span>
+            <span id="progress-text" class="font-bold text-white ml-1">0 / 0</span>
+          </div>
+          <div class="w-28 md:w-36 bg-emerald-950 rounded-full h-2.5 overflow-hidden border border-emerald-800">
+            <div id="progress-bar" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+  <main class="max-w-7xl mx-auto px-4 py-6">
 
-    <!-- Filters Section -->
-    <section class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 md:mb-8">
-      <div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        
-        <!-- Location Tabs -->
-        <div class="flex bg-slate-100 p-1 rounded-xl text-xs md:text-sm font-semibold w-full md:w-auto">
-          <button onclick="setLocationFilter('all')" id="loc-all" class="flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg bg-white text-emerald-800 shadow-sm transition">All Areas</button>
-          <button onclick="setLocationFilter('back')" id="loc-back" class="flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg text-slate-600 hover:text-emerald-800 transition">Back Garden (10)</button>
-          <button onclick="setLocationFilter('front')" id="loc-front" class="flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg text-slate-600 hover:text-emerald-800 transition">Front Garden (10)</button>
+    <!-- 12-Month Interactive Season Calendar Bar -->
+    <section class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-regular fa-calendar-days text-emerald-700"></i> Seasonal Pruning Schedule
+          </h2>
+          <p class="text-xs text-slate-500">Select any month to reveal all eligible pruning jobs. Color coded by horticultural season.</p>
         </div>
+        <div class="flex items-center gap-2 text-xs font-semibold">
+          <button onclick="setFilterMode('current')" id="btn-show-current" class="px-3 py-1.5 rounded-lg bg-emerald-800 text-white shadow-sm transition">
+            <i class="fa-solid fa-crosshairs mr-1"></i> Current Month
+          </button>
+          <button onclick="setFilterMode('all-year')" id="btn-show-all" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+            View All Year
+          </button>
+        </div>
+      </div>
 
-        <!-- Season Selector -->
-        <div class="flex flex-wrap gap-1.5 md:gap-2 text-xs font-semibold w-full md:w-auto">
-          <button onclick="setSeasonFilter('all')" id="season-all" class="px-3 py-2 rounded-lg bg-slate-800 text-white transition ring-2 ring-offset-1 ring-slate-800">All Timings</button>
-          <button onclick="setSeasonFilter('now')" id="season-now" class="px-3 py-2 rounded-lg bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300 transition flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Act Now (Autumn)
-          </button>
-          <button onclick="setSeasonFilter('winter')" id="season-winter" class="px-3 py-2 rounded-lg bg-sky-100 text-sky-900 hover:bg-sky-200 border border-sky-300 transition">
-            <i class="fa-regular fa-snowflake mr-1"></i> Winter Dormant
-          </button>
-          <button onclick="setSeasonFilter('spring')" id="season-spring" class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border border-emerald-300 transition">
-            <i class="fa-solid fa-seedling mr-1"></i> Spring (Mar-Apr)
-          </button>
-          <button onclick="setSeasonFilter('summer')" id="season-summer" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200 border border-rose-300 transition">
-            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Summer Warning
-          </button>
+      <!-- Month Buttons Grid -->
+      <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-1.5 text-xs font-bold" id="months-container">
+        <!-- Generated via JS with seasonal color coding -->
+      </div>
+
+      <!-- Legend -->
+      <div class="flex flex-wrap items-center gap-3 md:gap-5 mt-4 pt-3 border-t border-slate-100 text-[11px] font-medium text-slate-600">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-sky-200 border border-sky-400"></span> Winter (Dec–Feb)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-200 border border-emerald-400"></span> Spring (Mar–May)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-200 border border-rose-400"></span> Summer (Jun–Aug)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-200 border border-amber-400"></span> Autumn (Sep–Nov)</span>
+      </div>
+    </section>
+
+    <!-- Secondary Filters: Location, Tool, Search -->
+    <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center">
+      
+      <!-- Location Tabs -->
+      <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+        <button onclick="setLocationFilter('all')" id="loc-all" class="px-3.5 py-1.5 rounded-lg bg-white text-emerald-900 shadow-sm transition">All Gardens</button>
+        <button onclick="setLocationFilter('back')" id="loc-back" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-emerald-900 transition">Back Garden</button>
+        <button onclick="setLocationFilter('front')" id="loc-front" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-emerald-900 transition">Front Garden</button>
+      </div>
+
+      <!-- Tool & Search Controls -->
+      <div class="flex flex-col sm:flex-row items-center gap-2">
+        <div class="relative w-full sm:w-48">
+          <select id="tool-filter" onchange="setToolFilter(this.value)" class="w-full text-xs font-semibold bg-slate-100 text-slate-700 rounded-xl px-3 py-2 border-0 focus:ring-2 focus:ring-emerald-600">
+            <option value="all">All Tools</option>
+            <option value="Secateurs">Bypass Secateurs</option>
+            <option value="Shears">Hedge Shears</option>
+            <option value="Saw">Pruning Saw / Loppers</option>
+          </select>
+        </div>
+        
+        <div class="relative w-full sm:w-56">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+          <input type="text" id="search-input" oninput="setSearchQuery(this.value)" placeholder="Search plant or job..." class="w-full text-xs bg-slate-100 text-slate-800 rounded-xl pl-8 pr-3 py-2 border-0 focus:ring-2 focus:ring-emerald-600">
         </div>
       </div>
     </section>
 
-    <!-- Cards Grid -->
+    <!-- Context Status Banner -->
+    <div id="status-banner" class="mb-6 p-3.5 px-4 rounded-xl border flex items-center justify-between text-xs font-medium"></div>
+
+    <!-- Plants Cards Grid -->
     <div id="plants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
   </main>
 
   <script>
+    // 1-indexed months: 1=Jan ... 12=Dec
+    const MONTHS = [
+      { num: 1, name: "Jan", season: "Winter", bg: "bg-sky-100 text-sky-900 hover:bg-sky-200 border-sky-300 ring-sky-500" },
+      { num: 2, name: "Feb", season: "Winter", bg: "bg-sky-100 text-sky-900 hover:bg-sky-200 border-sky-300 ring-sky-500" },
+      { num: 3, name: "Mar", season: "Spring", bg: "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border-emerald-300 ring-emerald-500" },
+      { num: 4, name: "Apr", season: "Spring", bg: "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border-emerald-300 ring-emerald-500" },
+      { num: 5, name: "May", season: "Spring", bg: "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border-emerald-300 ring-emerald-500" },
+      { num: 6, name: "Jun", season: "Summer", bg: "bg-rose-100 text-rose-900 hover:bg-rose-200 border-rose-300 ring-rose-500" },
+      { num: 7, name: "Jul", season: "Summer", bg: "bg-rose-100 text-rose-900 hover:bg-rose-200 border-rose-300 ring-rose-500" },
+      { num: 8, name: "Aug", season: "Summer", bg: "bg-rose-100 text-rose-900 hover:bg-rose-200 border-rose-300 ring-rose-500" },
+      { num: 9, name: "Sep", season: "Autumn", bg: "bg-amber-100 text-amber-900 hover:bg-amber-200 border-amber-300 ring-amber-500" },
+      { num: 10, name: "Oct", season: "Autumn", bg: "bg-amber-100 text-amber-900 hover:bg-amber-200 border-amber-300 ring-amber-500" },
+      { num: 11, name: "Nov", season: "Autumn", bg: "bg-amber-100 text-amber-900 hover:bg-amber-200 border-amber-300 ring-amber-500" },
+      { num: 12, name: "Dec", season: "Winter", bg: "bg-sky-100 text-sky-900 hover:bg-sky-200 border-sky-300 ring-sky-500" }
+    ];
+
     const plants = [
       // ==========================================
       // BACK GARDEN
@@ -86,21 +144,20 @@
         name: "Boundary Wall Ivy",
         latin: "Hedera helix",
         location: "back",
-        season: "now",
-        seasonLabel: "Act Now (Autumn)",
+        season: "Autumn",
+        months: [9, 10, 2], // Sep, Oct, Feb
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165142000.jpg",
-        photoDesc: "Wall ivy in flower over orange tap timer",
+        photoDesc: "Wall ivy over tap & hose timer",
         localImage: "images/PXL_20260915_165142000.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&q=80",
-        tools: "Hedge Shears, Heavy Bypass Secateurs",
+        tools: "Hedge Shears, Secateurs",
         steps: [
-          "Use hedge shears to cut back tendrils that overhang the walkway, concrete wall cap, and water tap.",
-          "Keep the cutting line flush with the face of the block wall to retain an even green façade.",
-          "Leave the main body intact right now: the round yellow-green flower clusters provide essential late-season nectar for bees and hoverflies.",
-          "Postpone severe cutbacks or wall-stripping until late winter (February) before bird nesting season."
+          "Use hedge shears to trim back runners encroaching across the concrete wall cap, path, and water tap.",
+          "Keep cut line flush with the wall face to preserve a dense architectural foliage screen.",
+          "Keep flower umbels intact now: late nectar feeds bees and pollinators before winter.",
+          "Leave hard rejuvenation or wall stripping until February before nesting birds arrive."
         ],
-        rule: "Do not rip mature clinging stems off masonry by hand; slice them cleanly with secateurs to prevent pulling off plaster or mortar pointing.",
+        rule: "Do not pull vines off masonry by hand; snip them with secateurs to prevent pulling off mortar or plaster.",
         videoQuery: "how to trim ivy hedge shears RHS"
       },
       {
@@ -108,21 +165,20 @@
         name: "Climbing Lacecap Hydrangea",
         latin: "Hydrangea petiolaris",
         location: "back",
-        season: "spring",
-        seasonLabel: "Spring (March)",
+        season: "Spring",
+        months: [3, 4], // Mar, Apr
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_20260915_165145942.jpg",
-        photoDesc: "Climber with spent blooms beside hose reel",
+        photoDesc: "Climbing shrub with spent lacecaps beside hose reel",
         localImage: "images/PXL_20260915_165145942.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=600&q=80",
         tools: "Sharp Bypass Secateurs",
         steps: [
-          "Do not prune in autumn. Leave the dried brown flower bracts intact throughout winter to shield emerging buds from hard frost.",
-          "In March, cut all over-long shoots that project outward away from the wall back to a pair of plump green buds (leaving stems 10-15 cm long).",
-          "Tie in any strong young stems that you want to furnish bare patches on the wall.",
-          "Remove weak, dead, or congested crossing twigs from the wall frame."
+          "Do not prune in autumn. Keep spent brown lacecap heads through winter to shield lower flower buds from frost.",
+          "In March/April, prune shoots projecting away from the wall back to a pair of healthy plump buds (leave 10-15 cm spurs).",
+          "Tie in strong young shoots into any bare spaces on the wall.",
+          "Remove congested, dead, or crossing twigs."
         ],
-        rule: "Flowers form on the previous year's wood; pruning hard in autumn or early winter eliminates next summer's flower display.",
+        rule: "Hydrangea petiolaris flowers on wood formed the previous year; hard autumn pruning removes next summer's flowers.",
         videoQuery: "how to prune climbing hydrangea RHS"
       },
       {
@@ -130,21 +186,20 @@
         name: "Variegated Standard Holly",
         latin: "Ilex aquifolium 'Golden King'",
         location: "back",
-        season: "now",
-        seasonLabel: "Act Now (Light Shaping)",
+        season: "Autumn",
+        months: [8, 9, 10, 4], // Aug, Sep, Oct & Apr
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165148716.MP.jpg",
         photoDesc: "Lollipop topiary ball on clear trunk",
         localImage: "images/PXL_20260915_165148716.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
-        tools: "Hand Shears or Fine Bypass Secateurs",
+        tools: "Hand Shears, Secateurs",
         steps: [
-          "Step back 2-3 meters to visually identify shoots projecting beyond the rounded spherical profile.",
-          "Use hand shears or secateurs to snip stray shoots back into line with the canopy curve.",
-          "Make cuts just above an outward-facing leaf bud or leaf junction.",
-          "Wipe down your tool blades with methylated spirit or alcohol before and after trimming to prevent spreading leaf pathogens."
+          "Step back to spot shoots sticking out past the rounded spherical profile.",
+          "Use hand shears or secateurs to clip stray shoots flush to the ball curve.",
+          "Cut just above a leaf node; avoid tearing evergreen leaves with dull blades.",
+          "Disinfect tool blades with surgical spirit to avoid spreading fungal leaf spot."
         ],
-        rule: "Avoid power hedge trimmers if possible—they slice broad holly leaves in half, resulting in ugly brown desiccated leaf edges all winter.",
+        rule: "Avoid power hedge trimmers on holly; tearing thick leaves leaves unsightly brown edges all winter.",
         videoQuery: "pruning standard holly topiary ball"
       },
       {
@@ -152,20 +207,19 @@
         name: "Rockspray Cotoneaster",
         latin: "Cotoneaster horizontalis",
         location: "back",
-        season: "now",
-        seasonLabel: "Act Now (Minimal)",
+        season: "Autumn",
+        months: [9, 10, 2], // Light tidy Sep/Oct, renewal Feb
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165158191.MP.jpg",
-        photoDesc: "Fan groundcover with dense red berries",
+        photoDesc: "Low herringbone groundcover with red berries",
         localImage: "images/PXL_20260915_165158191.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1508873696983-2df5293cb32b?w=600&q=80",
-        tools: "Bypass Secateurs",
+        tools: "Secateurs",
         steps: [
-          "Leave the herringbone branches and red berries alone right now; they are a critical food reserve for garden birds throughout early winter.",
-          "Only trim individual stray stems that are crawling over neighboring low perennials or spilling into the path.",
-          "If reshaping is needed, wait until February (before spring growth starts) and cut unwanted branches flush back to the main horizontal limbs."
+          "Leave red berries untouched through autumn and early winter as food for garden birds.",
+          "Only snip stray stems that are crawling over adjacent low perennials or onto pathways.",
+          "If structural thinning is needed, cut unwanted branches flush to the main limbs in February before bud burst."
         ],
-        rule: "Do not shear the surface evenly. Cotoneaster has a distinctive, architectural herringbone branching habit that is ruined by flat shearing.",
+        rule: "Preserve the distinctive herringbone fan structure; do not shear cotoneaster into a flat hedge.",
         videoQuery: "how to prune cotoneaster horizontalis"
       },
       {
@@ -173,21 +227,20 @@
         name: "Mophead Hydrangea",
         latin: "Hydrangea macrophylla",
         location: "back",
-        season: "spring",
-        seasonLabel: "Spring (March-April)",
+        season: "Spring",
+        months: [3, 4], // Mar, Apr
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_20260915_165201505.jpg",
         photoDesc: "Hydrangea bush with dried purple flowerheads in mulch",
         localImage: "images/PXL_20260915_165201505.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?w=600&q=80",
         tools: "Bypass Secateurs",
         steps: [
-          "DO NOT DEADHEAD IN AUTUMN. The dried flowerheads act as natural protective tents against frost for the tender flower buds forming beneath them.",
-          "In late March/early April, follow each stem down from the old bloom to the first pair of healthy, swollen green buds and cut cleanly 5 mm above them.",
-          "Take 1 or 2 of the oldest, thickest, woody grey stems down to ground level to stimulate new basal canes from the crown.",
-          "Remove any thin, spindly, or dead twigs crowding the center."
+          "LEAVE HEADS IN PLACE OVER WINTER. Dried blooms protect developing buds below from hard freezing.",
+          "In late March/early April, cut stems back to the first pair of healthy, swollen green buds beneath the old head.",
+          "Cut 1 or 2 of the oldest, thickest, woody grey stems down to ground level to stimulate new basal canes.",
+          "Cut out thin, spindly, or dead center stems to improve air movement."
         ],
-        rule: "Mophead hydrangeas flower on stems produced during the previous summer; cutting them back hard now removes next year's blooms entirely.",
+        rule: "Autumn cutbacks remove next year's blooms since buds are set during late summer.",
         videoQuery: "monty don pruning hydrangeas"
       },
       {
@@ -195,20 +248,19 @@
         name: "Spotted Laurel",
         latin: "Aucuba japonica 'Variegata'",
         location: "back",
-        season: "spring",
-        seasonLabel: "Spring (April)",
+        season: "Spring",
+        months: [4, 5], // Apr, May
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_20260915_165211223.jpg",
-        photoDesc: "Dense yellow-speckled evergreen shrub",
+        photoDesc: "Yellow-speckled evergreen shrub",
         localImage: "images/PXL_20260915_165211223.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1584589167171-541ce45f1eea?w=600&q=80",
-        tools: "Secateurs, Long-handled Loppers",
+        tools: "Secateurs, Loppers",
         steps: [
-          "Avoid autumn pruning. Wounds made now turn black and die back during freezing weather.",
-          "In mid-spring (April), prune selectively using secateurs, following long, overgrown branches deep into the canopy and cutting just above an interior leaf node.",
-          "Aucuba responds well to hard renewal: you can cut old, thick stems down to 30 cm from the ground in April to encourage compact basal growth."
+          "Avoid autumn cuts. Cold wet weather causes fresh cut Aucuba stem ends to turn black and die back.",
+          "In April, prune individual overgrown branches deep within the canopy just above an interior leaf node.",
+          "If overgrown, cut stems hard down to 30 cm from ground level; Aucuba regenerates readily from old wood."
         ],
-        rule: "Never use hedge shears on Aucuba. Shearing slices through the large leather-like leaves, creating brown, decayed leaf edges that persist for months.",
+        rule: "Never use hedge shears on Aucuba; sheared leaf edges brown and decay.",
         videoQuery: "pruning aucuba japonica spotted laurel"
       },
       {
@@ -216,21 +268,20 @@
         name: "Lace-Leaf Japanese Maple",
         latin: "Acer palmatum dissectum",
         location: "back",
-        season: "winter",
-        seasonLabel: "Winter (Dec - Jan)",
+        season: "Winter",
+        months: [12, 1], // Dec, Jan
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_20260915_165214633.jpg",
-        photoDesc: "Lacy purple foliage on slender sculptural trunks",
+        photoDesc: "Lacy purple foliage on sculptural trunks",
         localImage: "images/PXL_20260915_165214633.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&q=80",
-        tools: "Fine Japanese Pruning Shears or Sharp Bypass Secateurs",
+        tools: "Fine Bypass Secateurs",
         steps: [
-          "Wait until all leaves have completely dropped and the tree is in deep winter dormancy (December to mid-January).",
-          "Remove the 3 Ds: any dead twigs (which snap easily and look grey), diseased wood, and damaged branch tips.",
-          "Work from the inside out: gently thin out crowded branches that rub against each other or cross backwards into the center.",
-          "Preserve the natural cascading habit—aim for layered horizontal branch 'fans' with daylight between tiers."
+          "Prune only while deeply dormant in mid-winter (December to mid-January) after all leaves have dropped.",
+          "Clear the 3 Ds: brittle grey dead twigs, diseased sections, and damaged branch tips.",
+          "Thin out crowded shoots crossing back into the center to highlight the cascading branch tiers.",
+          "Make cuts flush just outside the branch bark collar."
         ],
-        rule: "NEVER prune in late winter, spring, or early autumn. Maples suffer intense sap bleeding from cuts made while sap is moving, which weakens the tree.",
+        rule: "Never prune in late winter or spring. Acers bleed sap copiously if cut while sap is rising.",
         videoQuery: "pruning japanese maple dissectum herons bonsai"
       },
       {
@@ -238,21 +289,20 @@
         name: "Mexican Orange Blossom",
         latin: "Choisya ternata",
         location: "back",
-        season: "spring",
-        seasonLabel: "Late Spring (May)",
+        season: "Spring",
+        months: [5, 6], // May, Jun (after spring bloom)
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_20260915_165217528.MP.jpg",
-        photoDesc: "Glossy green rounded bush in mulch (orange plant label at base)",
+        photoDesc: "Glossy green bush in mulch (orange plant label at base)",
         localImage: "images/PXL_20260915_165217528.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
         tools: "Bypass Secateurs",
         steps: [
-          "Leave alone in autumn. Trimming now stimulates soft, tender late shoots that will be blackened and killed by early frosts.",
-          "Let the bush flower in spring (typically April/May with fragrant white blossoms).",
-          "Immediately after flowering in May/June, cut flowered stems back by 20-30 cm to a healthy leaf node to encourage a compact bush and repeat autumn blooms.",
-          "Remove any dead or frost-damaged stems down to green healthy wood in spring."
+          "Leave alone in autumn. Late trimming causes soft shoots that freeze during winter.",
+          "Allow the plant to flower in April/May.",
+          "Immediately after flowering in May/June, shorten flowered stems by 20-25 cm to a healthy leaf node to encourage compact growth and repeat autumn blossoms.",
+          "Cut out frost-blackened stems back to healthy green wood in spring."
         ],
-        rule: "Always prune Choisya after its main spring flowering window to protect both the flower display and the plant's winter frost hardiness.",
+        rule: "Always prune post-flowering in late spring to safeguard buds and winter hardiness.",
         videoQuery: "how to prune choisya ternata mexican orange blossom"
       },
       {
@@ -260,21 +310,20 @@
         name: "Purple Cherry Plum",
         latin: "Prunus cerasifera 'Nigra'",
         location: "back",
-        season: "summer",
-        seasonLabel: "Mid-Summer (July Only)",
+        season: "Summer",
+        months: [6, 7], // Jun, Jul
         seasonBadgeClass: "bg-rose-100 text-rose-900 border-rose-300",
-        photoRef: "PXL_20260915_165230186.MP.jpg",
         photoDesc: "Upright purple tree canopy against blue sky",
         localImage: "images/PXL_20260915_165230186.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=600&q=80",
-        tools: "Pruning Saw, Sharp Loppers",
+        tools: "Pruning Saw, Loppers",
         steps: [
-          "DO NOT TOUCH WITH PRUNERS NOW. Pruning stone fruit trees in autumn or winter exposes fresh wounds to airborne Silver Leaf fungus and bacterial canker spores.",
-          "Wait until mid-summer (June or July) on a dry, sunny day when the tree produces abundant sap and heals wounds rapidly.",
-          "In summer: Prune out crossing branches, remove dead/rubbing limbs, and crown-thin lightly to improve air flow.",
-          "Only remove a branch now if it is snapped, dangerous, or causing immediate physical damage."
+          "STRICT WARNING: DO NOT PRUNE IN AUTUMN OR WINTER.",
+          "Prunus species cut during damp months are susceptible to fatal Silver Leaf disease and bacterial canker.",
+          "Prune in July on a dry, sunny day when wounds gum over quickly and heal.",
+          "Thin out dead or crossing branches and keep the base clear of suckers."
         ],
-        rule: "CRITICAL: The mid-summer pruning rule is non-negotiable for Prunus species in wet maritime climates to prevent incurable Silver Leaf disease.",
+        rule: "Mid-summer pruning is mandatory for stone fruits in damp maritime climates.",
         videoQuery: "silver leaf disease prunus pruning timing"
       },
       {
@@ -282,47 +331,41 @@
         name: "Deciduous Shrub Frame",
         latin: "Syringa / Philadelphus framework",
         location: "back",
-        season: "winter",
-        seasonLabel: "Winter (Dec - Feb)",
+        season: "Winter",
+        months: [12, 1, 2], // Dec, Jan, Feb
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_20260915_165238208.jpg",
         photoDesc: "Multi-stemmed upright shrub frame with euphorbia at base",
         localImage: "images/PXL_20260915_165238208.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80",
-        tools: "Bypass Loppers, Pruning Saw",
+        tools: "Loppers, Pruning Saw, Secateurs",
         steps: [
-          "Wait for complete leaf drop in November/December to assess the branch framework clearly.",
-          "Remove dead, damaged, and rubbing branches at the junction point.",
-          "Thin out one or two of the thickest, oldest central upright stems down to ground level to prevent the plant becoming bare at the bottom.",
-          "Clear away grass, weeds, and fallen debris from the euphorbia and cyclamen bed around its base."
+          "Wait until leaves have dropped completely in winter to assess the bare branch structure.",
+          "Prune out dead, damaged, and crossing branches at their point of origin.",
+          "Cut 1 or 2 of the oldest central upright stems down to ground level to stimulate fresh basal renewal.",
+          "Clear away weed seedlings and fallen leaves from around the euphorbia and cyclamen at the base."
         ],
-        rule: "Always make pruning cuts just above an outward-facing bud at a 45-degree angle slanting away from the bud to shed rainwater.",
+        rule: "Cut at a 45-degree angle slanting away from outward-facing buds to shed water.",
         videoQuery: "winter deciduous shrub renewal pruning"
       },
-
-      // ==========================================
-      // BACK GARDEN FINALE
-      // ==========================================
       {
         id: "back-columnar-beech",
         name: "Columnar Beech Pillar",
         latin: "Fagus sylvatica 'Dawyck'",
         location: "back",
-        season: "now",
-        seasonLabel: "Act Now (Autumn)",
+        season: "Autumn",
+        months: [8, 9, 10], // Aug, Sep, Oct
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165257169.jpg",
         photoDesc: "Tall green upright column beside climbing wall panel",
         localImage: "images/PXL_20260915_165257169.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80",
-        tools: "Hedge Shears or Long-reach Hedge Trimmer",
+        tools: "Hedge Shears, Long-reach Trimmer",
         steps: [
-          "Trim the vertical faces and flat top now using sharp hedge shears to lock in a neat architectural shape for winter.",
-          "Trim flush with this season's growth line, leaving a clean, dense leafy surface.",
-          "Keep the top slightly narrower than the base (a slight taper, or 'batter') so daylight reaches the lowest branches.",
-          "Pruning now encourages beech to retain its warm, golden-copper leaves throughout the winter months."
+          "Trim vertical faces and the flat top using hedge shears to define the pillar shape for winter.",
+          "Trim back to the main foliage surface.",
+          "Taper the top slightly narrower than the base so lower branches receive light.",
+          "Autumn-pruned beech retains decorative copper-brown leaves throughout winter."
         ],
-        rule: "Late summer / early autumn trimming gives the neatest finish without stimulating soft frost-sensitive regrowth.",
+        rule: "Late summer to early autumn is the ideal window for formal beech shapes.",
         videoQuery: "trimming beech hedge autumn"
       },
       {
@@ -330,21 +373,19 @@
         name: "Weeping Umbrella Tree",
         latin: "Salix caprea 'Pendula' / Morus",
         location: "back",
-        season: "now",
-        seasonLabel: "Act Now (Skirt Trim)",
+        season: "Autumn",
+        months: [9, 10, 2], // Sep, Oct, Feb
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165308620.MP.jpg",
-        photoDesc: "Mound weeping umbrella canopy near trampoline and low wall",
+        photoDesc: "Weeping umbrella canopy near trampoline and low wall",
         localImage: "images/PXL_20260915_165308620.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80",
         tools: "Bypass Secateurs",
         steps: [
-          "Perform a 'skirt trim' around the entire perimeter hem of the tree.",
-          "Cut trailing tips so they hang a uniform 15-20 cm clear of the lawn surface.",
-          "Cut each stem just above an outward-facing bud along the natural curve of the canopy.",
-          "Inspect the top of the umbrella: prune away any branches that arch straight over the top and cross over the crown's center."
+          "Trim the perimeter hem so trailing tips hang 15-20 cm clear of the turf.",
+          "Cut stems just above an outward-facing bud along the natural curve of the umbrella canopy.",
+          "Remove dead twigs and branches that cross awkwardly across the top of the crown."
         ],
-        rule: "Preventing branches from touching damp lawn grass avoids rotting stems, keeps crawling pests out of the canopy, and simplifies mowing.",
+        rule: "Keeping branch tips off damp lawn grass prevents rot and simplifies mowing.",
         videoQuery: "pruning weeping umbrella tree skirt"
       },
       {
@@ -352,21 +393,20 @@
         name: "Domestic Apple Tree",
         latin: "Malus domestica",
         location: "back",
-        season: "winter",
-        seasonLabel: "Winter (Jan - Feb)",
+        season: "Winter",
+        months: [1, 2], // Jan, Feb
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_20260915_165334788.jpg",
         photoDesc: "Spreading fruit tree in corner by unpainted wall",
         localImage: "images/PXL_20260915_165334788.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=600&q=80",
-        tools: "Bypass Loppers, Curved Pruning Saw, Sharp Secateurs",
+        tools: "Bypass Loppers, Pruning Saw, Secateurs",
         steps: [
-          "Wait until deep winter (January or February) when the tree is fully dormant.",
-          "Clear the 3 Ds: cut out all dead wood, diseased shoots (canker), and damaged limbs right back to healthy wood.",
-          "Open the center: cut away crossing branches that rub against each other to create an open wine-goblet shape that lets sunlight into the center.",
-          "Shorten this summer's vigorous, vertical shoots (water sprouts) back to 3 buds above the basal cluster to create compact fruiting spurs."
+          "Wait for deep winter dormancy (January or February).",
+          "Remove the 3 Ds: dead wood, diseased branch tips (canker), and damaged shoots.",
+          "Thin out crossing branches to open the canopy center to sunlight.",
+          "Cut back vertical water sprouts to 3 buds from the main branches to form fruiting spurs."
         ],
-        rule: "Always make clean cuts outside the branch collar; never leave jagged branch stubs or cut flush against the main trunk.",
+        rule: "Cut outside the branch collar; avoid leaving stubs or cutting flush to the trunk.",
         videoQuery: "winter pruning apple tree RHS gardening"
       },
 
@@ -378,21 +418,20 @@
         name: "Front Purple Plum Tree",
         latin: "Prunus cerasifera 'Nigra'",
         location: "front",
-        season: "summer",
-        seasonLabel: "Mid-Summer (July Only)",
+        season: "Summer",
+        months: [6, 7], // Jun, Jul
         seasonBadgeClass: "bg-rose-100 text-rose-900 border-rose-300",
-        photoRef: "PXL_20260915_165400414.jpg",
-        photoDesc: "Large purple plum tree at driveway brick corner",
+        photoDesc: "Purple plum tree at driveway brick corner",
         localImage: "images/PXL_20260915_165400414.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=600&q=80",
         tools: "Pruning Saw, Loppers",
         steps: [
-          "LEAVE ALONE IN AUTUMN AND WINTER. Never prune ornamental plum or cherry trees between September and May.",
-          "Pruning during damp, cold months leaves cuts open to Silver Leaf spores (Chondrostereum purpureum), causing silvered leaves and limb dieback.",
-          "Schedule structural thinning for July on a warm, dry day when sap is actively sealing cuts.",
-          "In July: Prune out crossing branches, lower branches hitting cars or pedestrians, and suckers from the base."
+          "LEAVE ALONE IN AUTUMN AND WINTER. Never prune between September and May.",
+          "Cuts made during wet cold weather risk Silver Leaf fungal infection.",
+          "Thin crowded or crossing branches in July during dry, sunny weather.",
+          "Clear away low shoots over the driveway or pedestrian paths."
         ],
-        rule: "Strictly observe the July pruning rule for Prunus species to prevent fungal infection and bacterial canker.",
+        rule: "Mid-summer pruning is essential to prevent bacterial canker and Silver Leaf.",
         videoQuery: "pruning prunus trees summer timing silver leaf"
       },
       {
@@ -400,21 +439,20 @@
         name: "Purple Barberry Bush",
         latin: "Berberis thunbergii f. atropurpurea",
         location: "front",
-        season: "winter",
-        seasonLabel: "Winter (February)",
+        season: "Winter",
+        months: [2, 3], // Feb, Mar
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_20260915_165408451.jpg",
-        photoDesc: "Dense thorny reddish-purple bush under plum tree",
+        photoDesc: "Thorny reddish-purple bush under plum tree",
         localImage: "images/PXL_20260915_165408451.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1508873696983-2df5293cb32b?w=600&q=80",
-        tools: "Heavy Gauntlet Gloves, Sharp Secateurs, Loppers",
+        tools: "Heavy Gauntlet Gloves, Secateurs, Loppers",
         steps: [
-          "Wear thick leather gauntlet gloves—Berberis spines are sharp and can cause skin irritation.",
-          "Light autumn tidy: Clip off wayward thorny twigs protruding onto the driveway or interfering with lavender.",
-          "Winter renewal (February): Thin out up to one-quarter of the oldest, thickest woody stems right at the base.",
-          "This renewal pruning lets light into the bush and stimulates vibrant purple new shoots for next year."
+          "Wear thick leather gauntlets to protect against sharp spines.",
+          "Light autumn tidy: Snip back stray thorny shoots overhanging the driveway or lavender.",
+          "Winter renewal (February): Prune up to 1/4 of the oldest, thickest stems down to ground level.",
+          "Renewal pruning lets light into the center and promotes vibrant purple foliage."
         ],
-        rule: "Renewal pruning at ground level produces better leaf color and form than shearing the outside tips.",
+        rule: "Basal thinning produces better color and form than shearing outer branch tips.",
         videoQuery: "pruning berberis thunbergii barberry"
       },
       {
@@ -422,21 +460,20 @@
         name: "English Lavender Border",
         latin: "Lavandula angustifolia",
         location: "front",
-        season: "now",
-        seasonLabel: "Act Now (Top Priority)",
+        season: "Autumn",
+        months: [8, 9, 10], // Aug, Sep, Oct
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165415026.jpg",
-        photoDesc: "Sprawling lavender mound along tarmac driveway",
+        photoDesc: "Lavender mound along tarmac driveway",
         localImage: "images/PXL_20260915_165415026.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?w=600&q=80",
-        tools: "Sharp Hand Hedge Shears",
+        tools: "Hand Hedge Shears",
         steps: [
-          "Prune immediately before winter storms set in.",
-          "Using shears, slice off all dried grey flower stalks, taking roughly 2 to 3 cm of this year's soft green leaf growth with them.",
-          "Round the bushes into compact, domed mounds that shed heavy rain and snow.",
-          "NEVER cut into the woody, bare brown stems further down. Lavender will not break bud from old wood; cutting into bare wood leaves permanent dead gaps."
+          "Prune before winter storms begin.",
+          "Trim off all dried grey flower stalks along with 2-3 cm of soft green leaf growth.",
+          "Shape bushes into compact, domed cushions that shed rain and snow.",
+          "NEVER cut into bare, woody brown stems. Lavender will not sprout from old wood."
         ],
-        rule: "CRITICAL: Always leave plenty of soft green foliage below your cut. Cutting back to bare wood will kill that branch.",
+        rule: "Always leave soft green growth below your cuts; cutting into bare wood kills the branch.",
         videoQuery: "how to prune lavender monty don"
       },
       {
@@ -444,21 +481,20 @@
         name: "Front Shrub Rose",
         latin: "Rosa",
         location: "front",
-        season: "now",
-        seasonLabel: "Act Now (Windrock Prep)",
+        season: "Autumn",
+        months: [9, 10, 11, 3], // Autumn windrock (Sep-Nov) & Spring hard prune (Mar)
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165425292.jpg",
         photoDesc: "Tall rose canes with pink blooms in front bed",
         localImage: "images/PXL_20260915_165425292.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80",
-        tools: "Bypass Secateurs, Rose Gauntlet Gloves",
+        tools: "Bypass Secateurs, Gauntlet Gloves",
         steps: [
-          "Stage 1 (Now - Autumn): Deadhead remaining faded blooms and snip the tallest vertical canes back by one-third.",
-          "Why do this now? Autumn gales catch tall stems, rocking the plant and loosening the root ball in wet soil ('windrock').",
-          "Stage 2 (March): Hard pruning. Cut stems back to 15-20 cm above soil level, just above a dormant outward-facing bud.",
-          "Cut at a 45-degree angle sloping away from the bud to let rainwater drain off cleanly."
+          "Autumn Windrock Prevention: Deadhead spent flowers and reduce tall canes by 1/3.",
+          "Reducing height prevents strong winds from rocking the plant and loosening the roots in wet soil.",
+          "Hard Pruning in March: Cut canes back to 15-20 cm above soil level, just above an outward-facing bud.",
+          "Cut at a 45-degree angle sloping away from the bud to shed water."
         ],
-        rule: "Autumn is for windrock prevention only; keep your hard structural pruning for early spring.",
+        rule: "Perform light height reduction in autumn; save hard pruning for early spring.",
         videoQuery: "autumn rose pruning windrock david austin"
       },
       {
@@ -466,21 +502,20 @@
         name: "Irish Yew Column",
         latin: "Taxus baccata 'Fastigiata'",
         location: "front",
-        season: "now",
-        seasonLabel: "Act Now (Autumn)",
+        season: "Autumn",
+        months: [8, 9, 10], // Aug, Sep, Oct
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165438329.jpg",
         photoDesc: "Conifer pillar with wild briars shooting through",
         localImage: "images/PXL_20260915_165438329.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
-        tools: "Heavy Thorn-proof Gloves, Bypass Secateurs, Hedge Shears",
+        tools: "Heavy Gloves, Bypass Secateurs, Hedge Shears",
         steps: [
-          "First, tackle the wild thorny briars/runners shooting out from the yew: put on heavy gloves, trace stems down through the needle foliage to soil level, and sever them flush with the ground.",
-          "Use hand shears to lightly trim the outer vertical circumference, taking off long wisp growth.",
-          "Square off or round the top profile neatly to keep the architectural column defined.",
-          "Unlike most conifers, Yew will sprout from old bare wood if you ever need to cut it back harder."
+          "Trace wild thorny briars through the needles down to soil level and cut them flush with the ground.",
+          "Use hand shears to trim the outer vertical circumference, removing wayward shoots.",
+          "Neaten the flat top to keep the columnar shape defined through winter.",
+          "Unlike most conifers, Yew tolerates hard pruning and will regrow from old wood if resized."
         ],
-        rule: "Extract briars completely at soil level; simply snipping off the tips will cause them to branch and tangle deeper into the yew.",
+        rule: "Cut briars at soil level; trimming just the tips will cause them to branch inside the yew.",
         videoQuery: "trimming yew column hedge shears"
       },
       {
@@ -488,21 +523,20 @@
         name: "Corkscrew Hazel",
         latin: "Corylus avellana 'Contorta'",
         location: "front",
-        season: "winter",
-        seasonLabel: "Winter (Nov - Jan)",
+        season: "Winter",
+        months: [11, 12, 1], // Nov, Dec, Jan
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_20260915_165450925.MP.jpg",
         photoDesc: "Bush with curled crinkly leaves by low wall",
         localImage: "images/PXL_20260915_165450925.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80",
         tools: "Bypass Secateurs, Small Loppers",
         steps: [
-          "Wait until all leaves fall in November so the twisted framework is clearly visible.",
-          "ROOTSTOCK CHECK: Check for vigorous, straight, non-twisted shoots emerging from the soil.",
-          "Cut all straight suckers flush back to the base immediately—they originate from the common hazel rootstock and will smother the twisted corkscrew top if left alone.",
-          "Thin out rubbing branches to show off the ornamental zigzagging stems and pendulous winter catkins."
+          "Wait until leaves drop in November to inspect the twisted branch structure.",
+          "CHECK ROOTSTOCK: Look for straight, non-twisting shoots emerging from the base.",
+          "Cut all straight suckers flush to the ground immediately; they will outgrow the twisted branches if left alone.",
+          "Thin out rubbing branches to showcase the ornamental zigzag stems and winter catkins."
         ],
-        rule: "Straight sucker removal is essential on grafted corkscrew hazel to maintain its weeping form.",
+        rule: "Remove straight rootstock suckers completely to preserve the contorted cultivar.",
         videoQuery: "pruning contorted corkscrew hazel suckers"
       },
       {
@@ -510,21 +544,20 @@
         name: "Willow-Leaved Shrub",
         latin: "Elaeagnus commutata / Cotoneaster",
         location: "front",
-        season: "now",
-        seasonLabel: "Act Now (Light Tidy)",
+        season: "Autumn",
+        months: [9, 10], // Sep, Oct
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165453961.jpg",
         photoDesc: "Silver-green shrub with upright whips in mulch",
         localImage: "images/PXL_20260915_165453961.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
         tools: "Bypass Secateurs",
         steps: [
-          "Snip back the long, upright whip shoots projecting above the rounded dome.",
-          "Cut each whip stem back inside the canopy profile just above an outward-facing leaf bud.",
-          "Trim back sides that crowd adjacent shrubs in the border.",
-          "Do not shear with hedge trimmers; cutting individual stems maintains the soft, natural shape."
+          "Snip back upright whip shoots projecting above the rounded dome.",
+          "Prune each whip back inside the canopy profile just above an outward-facing bud.",
+          "Trim sides that crowd neighboring border plants.",
+          "Prune individual stems by hand rather than shearing to retain the soft natural shape."
         ],
-        rule: "Prune back to an outward bud so new growth branches away from the shrub's center.",
+        rule: "Prune back to outward-facing buds so new shoots branch away from the center.",
         videoQuery: "how to prune elaeagnus shrub"
       },
       {
@@ -532,21 +565,20 @@
         name: "Weeping Silver Birch",
         latin: "Betula pendula 'Youngii'",
         location: "front",
-        season: "winter",
-        seasonLabel: "Winter (Nov - Dec Only)",
+        season: "Winter",
+        months: [11, 12], // Nov, Dec strictly
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_20260915_165459960.jpg",
-        photoDesc: "Weeping tree on front lawn (photo with blue hula hoop)",
+        photoDesc: "Weeping tree on front lawn with blue hula hoop",
         localImage: "images/PXL_20260915_165459960.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80",
         tools: "Bypass Secateurs, Small Pruning Saw",
         steps: [
-          "PRUNE STRICTLY BEFORE CHRISTMAS. Birch trees must be pruned during deep mid-winter dormancy (November to late December).",
-          "If cut in late winter or early spring, birch trees will 'bleed' sap heavily due to rising root pressure.",
-          "Skirt trim: Shorten the lowest pendulous weeping tips so they hang roughly 20 cm clear of the grass.",
-          "Thin out dead twigs and branches that cross over or rub against the main trunk framework."
+          "PRUNE BEFORE CHRISTMAS. Prune only during deep dormancy (November to late December).",
+          "Birch trees bleed sap heavily if cut from January onward as root pressure increases.",
+          "Trim the bottom hem so trailing whips hang roughly 20 cm clear of the lawn.",
+          "Thin out dead twigs and branches that rub against the main trunk."
         ],
-        rule: "Never prune birch between January and May when sap flows rapidly.",
+        rule: "Never prune birch between January and May when sap flows heavily.",
         videoQuery: "pruning weeping silver birch youngii"
       },
       {
@@ -554,21 +586,20 @@
         name: "Front Lawn Hydrangea",
         latin: "Hydrangea macrophylla",
         location: "front",
-        season: "spring",
-        seasonLabel: "Spring (March)",
+        season: "Spring",
+        months: [3, 4], // Mar, Apr
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_20260915_165506993.jpg",
         photoDesc: "Rounded green hydrangea bush growing in front grass",
         localImage: "images/PXL_20260915_165506993.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?w=600&q=80",
         tools: "Sharp Bypass Secateurs",
         steps: [
-          "Leave completely untouched through autumn and winter.",
-          "Current canopy foliage and spent blooms protect the interior crown and buds from frost.",
-          "In late March: Cut back each stem to the first pair of healthy, swollen green buds below the old growth.",
-          "Remove any thin, spindly, or crossing stems in the center of the bush to improve airflow."
+          "Leave untouched through autumn and winter.",
+          "Spent blooms and foliage insulate interior flower buds from cold damage.",
+          "In late March: Cut stems back to the top pair of plump, green buds below the old growth.",
+          "Remove thin, spindly shoots in the center to improve ventilation."
         ],
-        rule: "Cutting back hydrangea stems hard in autumn exposes interior buds to frost damage.",
+        rule: "Autumn cutbacks expose tender interior buds to winter frost.",
         videoQuery: "pruning mophead hydrangea spring"
       },
       {
@@ -576,27 +607,31 @@
         name: "Front Holly Standard Lollipop",
         latin: "Ilex aquifolium 'Golden King'",
         location: "front",
-        season: "now",
-        seasonLabel: "Act Now (Light Tidy)",
+        season: "Autumn",
+        months: [8, 9, 10, 4], // Aug, Sep, Oct & Apr
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_20260915_165514917.jpg",
-        photoDesc: "Variegated lollipop standard near front house window",
+        photoDesc: "Variegated lollipop standard near front window",
         localImage: "images/PXL_20260915_165514917.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
         tools: "Hand Shears, Secateurs",
         steps: [
-          "Inspect the sphere from multiple angles to identify stray shoots breaking the round shape.",
-          "Use hand shears or secateurs to clip wild shoots back to the spherical profile.",
-          "Cut just above a leaf node; avoid tearing leaves with dull blades.",
-          "If the globe needs harder reduction, wait until late spring (April) just before new growth starts."
+          "Inspect the sphere from multiple angles to identify stray shoots breaking the shape.",
+          "Use hand shears or secateurs to clip wild shoots back into the spherical profile.",
+          "Cut just above a leaf node; avoid tearing foliage.",
+          "If the globe needs harder reduction, wait until late spring (April) before new growth starts."
         ],
-        rule: "Light autumn trimming maintains shape for winter; reserve hard structural resizing for spring.",
+        rule: "Light autumn trimming maintains shape; save structural resizing for spring.",
         videoQuery: "shaping standard holly lollipop tree"
       }
     ];
 
-    let currentLoc = 'all';
-    let currentSeason = 'all';
+    // State
+    const currentRealMonth = new Date().getMonth() + 1; // 1-12
+    let selectedMonth = currentRealMonth;
+    let filterMode = 'current'; // 'current' or 'all-year'
+    let selectedLocation = 'all';
+    let selectedTool = 'all';
+    let searchQuery = '';
 
     function getStorageKey(id) {
       return `prune_status_${id}`;
@@ -612,64 +647,178 @@
       } else {
         localStorage.setItem(getStorageKey(id), 'done');
       }
-      renderCards();
-      updateProgress();
+      render();
+    }
+
+    function saveNote(id, text) {
+      localStorage.setItem(`prune_note_${id}`, text);
+    }
+
+    function getNote(id) {
+      return localStorage.getItem(`prune_note_${id}`) || '';
+    }
+
+    function buildMonthButtons() {
+      const container = document.getElementById('months-container');
+      container.innerHTML = '';
+
+      MONTHS.forEach(m => {
+        const isCurrent = (m.num === currentRealMonth);
+        const isSelected = (filterMode === 'current' && m.num === selectedMonth);
+
+        const btn = document.createElement('button');
+        btn.id = `month-btn-${m.num}`;
+        btn.className = `month-btn py-2 px-1 rounded-xl border flex flex-col items-center justify-center transition-all ${m.bg} ${isSelected ? 'active-month ring-2 ring-slate-800' : ''}`;
+        
+        btn.innerHTML = `
+          <span class="text-[10px] tracking-wider uppercase opacity-75">${m.name}</span>
+          <span class="text-[11px] font-black">${m.season}</span>
+          ${isCurrent ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mt-1" title="Current Month"></span>' : ''}
+        `;
+
+        btn.onclick = () => {
+          selectedMonth = m.num;
+          filterMode = 'current';
+          render();
+        };
+
+        container.appendChild(btn);
+      });
+    }
+
+    function setFilterMode(mode) {
+      filterMode = mode;
+      if (mode === 'current') {
+        selectedMonth = currentRealMonth;
+      }
+      render();
     }
 
     function setLocationFilter(loc) {
-      currentLoc = loc;
+      selectedLocation = loc;
       ['all', 'back', 'front'].forEach(k => {
         const btn = document.getElementById(`loc-${k}`);
         if (k === loc) {
-          btn.className = "flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg bg-white text-emerald-800 shadow-sm transition";
+          btn.className = "px-3.5 py-1.5 rounded-lg bg-white text-emerald-900 shadow-sm transition";
         } else {
-          btn.className = "flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg text-slate-600 hover:text-emerald-800 transition";
+          btn.className = "px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-emerald-900 transition";
         }
       });
-      renderCards();
+      render();
     }
 
-    function setSeasonFilter(season) {
-      currentSeason = season;
-      ['all', 'now', 'winter', 'spring', 'summer'].forEach(s => {
-        const btn = document.getElementById(`season-${s}`);
-        if (s === season) {
-          btn.classList.add('ring-2', 'ring-offset-1', 'ring-slate-800');
-        } else {
-          btn.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800');
+    function setToolFilter(tool) {
+      selectedTool = tool;
+      render();
+    }
+
+    function setSearchQuery(q) {
+      searchQuery = q.toLowerCase().trim();
+      render();
+    }
+
+    function updateHeaderAndBanner(filteredPlants) {
+      const activeMonthObj = MONTHS.find(m => m.num === selectedMonth);
+      const isCurrent = (selectedMonth === currentRealMonth);
+
+      const banner = document.getElementById('status-banner');
+      const subtitle = document.getElementById('header-subtitle');
+
+      if (filterMode === 'all-year') {
+        subtitle.innerText = "Displaying all 20 garden plants across the whole year";
+        banner.className = "mb-6 p-3.5 px-4 rounded-xl border bg-slate-200 border-slate-300 text-slate-800 flex items-center justify-between text-xs font-semibold";
+        banner.innerHTML = `
+          <span><i class="fa-solid fa-list mr-1.5 text-slate-600"></i> Showing all plants (Full Year Overview). Select any month above to filter.</span>
+          <span class="bg-slate-300 px-2.5 py-1 rounded-md text-slate-800">${filteredPlants.length} Plants</span>
+        `;
+      } else {
+        subtitle.innerText = `Showing tasks for ${activeMonthObj.name} (${activeMonthObj.season})${isCurrent ? ' - Current Month' : ''}`;
+        
+        let bannerStyle = "bg-amber-50 border-amber-300 text-amber-950";
+        if (activeMonthObj.season === 'Winter') bannerStyle = "bg-sky-50 border-sky-300 text-sky-950";
+        if (activeMonthObj.season === 'Spring') bannerStyle = "bg-emerald-50 border-emerald-300 text-emerald-950";
+        if (activeMonthObj.season === 'Summer') bannerStyle = "bg-rose-50 border-rose-300 text-rose-950";
+
+        banner.className = `mb-6 p-3.5 px-4 rounded-xl border flex items-center justify-between text-xs font-semibold ${bannerStyle}`;
+        banner.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full ${isCurrent ? 'bg-emerald-500 animate-ping' : 'bg-slate-400'}"></span>
+            <span>Pruning tasks for <strong>${activeMonthObj.name}</strong> (${activeMonthObj.season})${isCurrent ? ' — Active This Month' : ''}</span>
+          </div>
+          <span class="px-2.5 py-1 rounded-md bg-white/80 border text-[11px] font-bold">${filteredPlants.length} Actionable</span>
+        `;
+      }
+
+      // Update button state styles
+      document.getElementById('btn-show-current').className = (filterMode === 'current' && selectedMonth === currentRealMonth) 
+        ? "px-3 py-1.5 rounded-lg bg-emerald-800 text-white shadow-sm transition"
+        : "px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+
+      document.getElementById('btn-show-all').className = (filterMode === 'all-year')
+        ? "px-3 py-1.5 rounded-lg bg-slate-800 text-white shadow-sm transition"
+        : "px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+
+      MONTHS.forEach(m => {
+        const btn = document.getElementById(`month-btn-${m.num}`);
+        if (btn) {
+          if (filterMode === 'current' && m.num === selectedMonth) {
+            btn.classList.add('active-month', 'ring-2', 'ring-slate-800');
+          } else {
+            btn.classList.remove('active-month', 'ring-2', 'ring-slate-800');
+          }
         }
       });
-      renderCards();
-    }
 
-    function updateProgress() {
-      const completedCount = plants.filter(p => isCompleted(p.id)).length;
-      const total = plants.length;
-      const pct = total === 0 ? 0 : Math.round((completedCount / total) * 100);
-      document.getElementById('progress-text').innerText = `${completedCount} / ${total}`;
+      // Overall completed stats
+      const totalDone = plants.filter(p => isCompleted(p.id)).length;
+      const pct = Math.round((totalDone / plants.length) * 100);
+      document.getElementById('progress-text').innerText = `${totalDone} / ${plants.length}`;
       document.getElementById('progress-bar').style.width = `${pct}%`;
     }
 
-    function renderCards() {
+    function render() {
       const grid = document.getElementById('plants-grid');
       grid.innerHTML = '';
 
       const filtered = plants.filter(p => {
-        const matchesLoc = (currentLoc === 'all' || p.location === currentLoc);
-        const matchesSeason = (currentSeason === 'all' || p.season === currentSeason);
-        return matchesLoc && matchesSeason;
+        // Month / Season match
+        const matchesMonth = (filterMode === 'all-year') || p.months.includes(selectedMonth);
+
+        // Location match
+        const matchesLoc = (selectedLocation === 'all') || (p.location === selectedLocation);
+
+        // Tool match
+        const matchesTool = (selectedTool === 'all') || p.tools.toLowerCase().includes(selectedTool.toLowerCase());
+
+        // Search match
+        const matchesSearch = !searchQuery || 
+          p.name.toLowerCase().includes(searchQuery) ||
+          p.latin.toLowerCase().includes(searchQuery) ||
+          p.photoDesc.toLowerCase().includes(searchQuery) ||
+          p.steps.some(s => s.toLowerCase().includes(searchQuery));
+
+        return matchesMonth && matchesLoc && matchesTool && matchesSearch;
       });
 
+      updateHeaderAndBanner(filtered);
+
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 font-semibold text-sm">No plants match the selected filter combination.</div>`;
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center bg-white rounded-2xl border border-slate-200 p-8">
+            <i class="fa-solid fa-bed text-4xl text-slate-300 mb-3"></i>
+            <h3 class="font-bold text-slate-700 text-base mb-1">No Pruning Tasks Due</h3>
+            <p class="text-xs text-slate-500 max-w-md mx-auto">None of your garden plants are scheduled for pruning under the selected month or filters. Let the garden rest, or switch to 'View All Year' above.</p>
+          </div>
+        `;
         return;
       }
 
       filtered.forEach(plant => {
         const done = isCompleted(plant.id);
+        const note = getNote(plant.id);
         const card = document.createElement('div');
         card.className = `plant-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 transition duration-200 flex flex-col justify-between ${done ? 'completed' : ''}`;
-        
+
         const stepsList = plant.steps.map((step, idx) => `
           <li class="flex items-start gap-2">
             <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold shrink-0 mt-0.5">${idx + 1}</span>
@@ -677,9 +826,9 @@
           </li>
         `).join('');
 
+        // Clean image view: NO FILENAME DISPLAYED on image
         card.innerHTML = `
           <div>
-            <!-- Image with automatic fallback -->
             <div class="relative h-60 bg-slate-100 overflow-hidden">
               <img 
                 src="${plant.localImage}" 
@@ -687,35 +836,37 @@
                 class="w-full h-full object-cover"
                 onerror="this.onerror=null; this.src='${plant.fallbackImage}';" 
               />
-              <span class="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full border ${plant.seasonBadgeClass} shadow-sm backdrop-blur-sm bg-opacity-95">
-                ${plant.seasonLabel}
+              <span class="absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full border ${plant.seasonBadgeClass} shadow-sm backdrop-blur-sm bg-opacity-95">
+                ${plant.season}
               </span>
-              <span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded bg-black/60 text-white backdrop-blur-sm">
+              <span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
                 ${plant.location === 'back' ? 'Back Garden' : 'Front Garden'}
               </span>
-              <div class="absolute bottom-2 left-3 right-3 bg-black/80 backdrop-blur-sm text-white text-[11px] px-2.5 py-1 rounded flex items-center justify-between">
-                <span class="font-mono text-emerald-300 font-medium truncate">${plant.photoRef}</span>
-                <span class="truncate ml-2 text-slate-300 text-[10px]">${plant.photoDesc}</span>
+              
+              <!-- Subtle plant description only (filename removed) -->
+              <div class="absolute bottom-2 left-3 right-3 bg-black/75 backdrop-blur-sm text-white text-[11px] px-3 py-1.5 rounded-lg flex items-center justify-between">
+                <span class="truncate text-slate-200">${plant.photoDesc}</span>
+                <span class="text-emerald-300 font-bold ml-2 shrink-0">${plant.months.map(m => MONTHS[m-1].name).join(', ')}</span>
               </div>
             </div>
 
-            <!-- Content Area -->
+            <!-- Card Body -->
             <div class="p-5">
               <div class="flex justify-between items-start gap-2 mb-2">
                 <div>
                   <h3 class="font-bold text-slate-800 text-lg leading-tight">${plant.name}</h3>
                   <p class="text-xs italic text-slate-400 mt-0.5">${plant.latin}</p>
                 </div>
-                <button onclick="toggleComplete('${plant.id}')" title="Mark as Done" class="p-2.5 rounded-xl transition ${done ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'}">
+                <button onclick="toggleComplete('${plant.id}')" title="Mark as Done" class="p-2.5 rounded-xl transition ${done ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'}">
                   <i class="fa-solid fa-check text-base"></i>
                 </button>
               </div>
 
-              <div class="space-y-3">
+              <div class="space-y-3 mt-3">
                 <!-- Step-by-Step Instructions -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                   <span class="font-bold text-slate-700 text-xs block mb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-list-check text-emerald-600"></i> Step-by-Step Instructions:
+                    <i class="fa-solid fa-list-check text-emerald-700"></i> Step-by-Step Pruning:
                   </span>
                   <ul class="space-y-1.5">
                     ${stepsList}
@@ -723,26 +874,40 @@
                 </div>
 
                 <!-- Golden Rule Warning -->
-                <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200/70 text-amber-950 text-xs">
+                <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200/80 text-amber-950 text-xs">
                   <span class="font-bold block mb-0.5 text-amber-800">
                     <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i>Key Rule:
                   </span>
                   <p class="leading-relaxed text-[11px]">${plant.rule}</p>
                 </div>
+
+                <!-- Notes / Date Log -->
+                <div class="pt-1">
+                  <div class="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                    <span class="font-medium"><i class="fa-regular fa-pen-to-square mr-1"></i>My Pruning Notes / Date:</span>
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Trimmed by 20 cm on 15 Sept..." 
+                    value="${note}" 
+                    onchange="saveNote('${plant.id}', this.value)"
+                    class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 focus:bg-white focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Footer with Tools and Video Link -->
-          <div class="px-5 pb-5 pt-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <span class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5 truncate max-w-[55%]">
-              <i class="fa-solid fa-toolbox text-slate-400"></i> ${plant.tools}
+          <!-- Footer -->
+          <div class="px-5 pb-4 pt-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/60">
+            <span class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5 truncate max-w-[58%]">
+              <i class="fa-solid fa-wrench text-slate-400"></i> ${plant.tools}
             </span>
             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(plant.videoQuery)}" 
                target="_blank" 
                rel="noopener noreferrer" 
                class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 hover:underline">
-              <i class="fa-brands fa-youtube text-base"></i> Watch Guide
+              <i class="fa-brands fa-youtube text-base"></i> Video Guide
             </a>
           </div>
         `;
@@ -751,8 +916,9 @@
       });
     }
 
-    renderCards();
-    updateProgress();
+    // Initialize
+    buildMonthButtons();
+    render();
   </script>
 </body>
 </html>
