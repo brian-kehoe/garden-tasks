@@ -1,4 +1,83 @@
-const plants = [
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garden Pruning Planner & Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .plant-card.completed {
+      opacity: 0.78;
+      border-color: #10b981;
+      background-color: #f0fdf4;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+  <!-- Sticky App Header -->
+  <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+          <i class="fa-solid fa-scissors text-emerald-300"></i> Garden Pruning Planner
+        </h1>
+        <p class="text-xs text-emerald-200">Interactive roadmap & tracker for back and front gardens</p>
+      </div>
+
+      <!-- Live Progress Bar -->
+      <div class="bg-emerald-900/60 p-2.5 px-4 rounded-xl flex items-center gap-4 border border-emerald-700/50 w-full md:w-auto">
+        <div class="text-xs md:text-sm">
+          <span class="font-medium text-emerald-200">Progress:</span>
+          <span id="progress-text" class="font-bold text-white ml-1">0 / 0</span>
+        </div>
+        <div class="w-32 md:w-40 bg-emerald-950 rounded-full h-2.5 overflow-hidden border border-emerald-700">
+          <div id="progress-bar" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+
+    <!-- Filters Section -->
+    <section class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 md:mb-8">
+      <div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        
+        <!-- Location Tabs -->
+        <div class="flex bg-slate-100 p-1 rounded-xl text-xs md:text-sm font-semibold w-full md:w-auto">
+          <button onclick="setLocationFilter('all')" id="loc-all" class="flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg bg-white text-emerald-800 shadow-sm transition">All Areas</button>
+          <button onclick="setLocationFilter('back')" id="loc-back" class="flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg text-slate-600 hover:text-emerald-800 transition">Back Garden</button>
+          <button onclick="setLocationFilter('front')" id="loc-front" class="flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg text-slate-600 hover:text-emerald-800 transition">Front Garden</button>
+        </div>
+
+        <!-- Season Selector -->
+        <div class="flex flex-wrap gap-1.5 md:gap-2 text-xs font-semibold w-full md:w-auto">
+          <button onclick="setSeasonFilter('all')" id="season-all" class="px-3 py-2 rounded-lg bg-slate-800 text-white transition ring-2 ring-offset-1 ring-slate-800">All</button>
+          <button onclick="setSeasonFilter('now')" id="season-now" class="px-3 py-2 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300 transition flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Act Now (Autumn)
+          </button>
+          <button onclick="setSeasonFilter('winter')" id="season-winter" class="px-3 py-2 rounded-lg bg-sky-100 text-sky-800 hover:bg-sky-200 border border-sky-300 transition">
+            <i class="fa-regular fa-snowflake mr-1"></i> Winter Dormant
+          </button>
+          <button onclick="setSeasonFilter('spring')" id="season-spring" class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300 transition">
+            <i class="fa-solid fa-seedling mr-1"></i> Spring (Mar-Apr)
+          </button>
+          <button onclick="setSeasonFilter('summer')" id="season-summer" class="px-3 py-2 rounded-lg bg-rose-100 text-rose-800 hover:bg-rose-200 border border-rose-300 transition">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Summer Warning
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cards Grid -->
+    <div id="plants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+  </main>
+
+  <script>
+    const plants = [
       // BACK GARDEN
       {
         id: "back-ivy",
@@ -8,7 +87,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Autumn)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165201505.jpg",
+        photoRef: "PXL_20260915_165201505.jpg",
         photoDesc: "Wall ivy over hose attachment / tap",
         localImage: "images/PXL_20260915_165201505.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&q=80",
@@ -25,7 +104,7 @@ const plants = [
         season: "spring",
         seasonLabel: "Spring (March)",
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_...165211223.jpg",
+        photoRef: "PXL_20260915_165211223.jpg",
         photoDesc: "Climbing shrub next to green hose reel",
         localImage: "images/PXL_20260915_165211223.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=600&q=80",
@@ -42,7 +121,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Autumn)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165214633.jpg",
+        photoRef: "PXL_20260915_165214633.jpg",
         photoDesc: "Lollipop variegated ball on clear trunk",
         localImage: "images/PXL_20260915_165214633.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
@@ -59,7 +138,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Minimal)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165217528.MP.jpg",
+        photoRef: "PXL_20260915_165217528.MP.jpg",
         photoDesc: "Low groundcover with bright red berries",
         localImage: "images/PXL_20260915_165217528.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1508873696983-2df5293cb32b?w=600&q=80",
@@ -76,7 +155,7 @@ const plants = [
         season: "spring",
         seasonLabel: "Spring (March-April)",
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_...165230186.MP.jpg",
+        photoRef: "PXL_20260915_165230186.MP.jpg",
         photoDesc: "Hydrangea bush with dried flowerheads in mulch",
         localImage: "images/PXL_20260915_165230186.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?w=600&q=80",
@@ -93,7 +172,7 @@ const plants = [
         season: "spring",
         seasonLabel: "Spring (April)",
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_...165238208.jpg",
+        photoRef: "PXL_20260915_165238208.jpg",
         photoDesc: "Yellow-speckled shrub with yellow pot near base",
         localImage: "images/PXL_20260915_165238208.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1584589167171-541ce45f1eea?w=600&q=80",
@@ -110,7 +189,7 @@ const plants = [
         season: "winter",
         seasonLabel: "Winter (Dec - Jan)",
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_...165246493.jpg",
+        photoRef: "PXL_20260915_165246493.jpg",
         photoDesc: "Delicate cutleaf purple foliage on slender trunks",
         localImage: "images/PXL_20260915_165246493.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&q=80",
@@ -127,7 +206,7 @@ const plants = [
         season: "summer",
         seasonLabel: "Mid-Summer (July Only)",
         seasonBadgeClass: "bg-rose-100 text-rose-900 border-rose-300",
-        photoRef: "PXL_...165257169.jpg",
+        photoRef: "PXL_20260915_165257169.jpg",
         photoDesc: "Tall purple canopy tree next to wooden shelter",
         localImage: "images/PXL_20260915_165257169.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=600&q=80",
@@ -137,6 +216,23 @@ const plants = [
         videoQuery: "silver leaf disease prunus pruning timing"
       },
       {
+        id: "back-shelter-shrub",
+        name: "Border Shrub Behind Bike Shelter",
+        latin: "Cornus / Viburnum",
+        location: "back",
+        season: "winter",
+        seasonLabel: "Winter (Dec - Feb)",
+        seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
+        photoRef: "PXL_20260915_165308620.MP.jpg",
+        photoDesc: "Shrub mass behind post with white sensor",
+        localImage: "images/PXL_20260915_165308620.MP.jpg",
+        fallbackImage: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80",
+        tools: "Loppers, Secateurs",
+        instructions: "Once leaves drop, trim back branches that press against the shed roof or obscure the sensor. Thin out dead wood.",
+        rule: "Keep vegetation at least 15 cm clear of timber structures to prevent moisture retention and wood rot.",
+        videoQuery: "winter shrub rejuvenation pruning"
+      },
+      {
         id: "back-columnar-beech",
         name: "Upright Beech Column",
         latin: "Fagus sylvatica",
@@ -144,7 +240,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Autumn)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165334788.jpg",
+        photoRef: "PXL_20260915_165334788.jpg",
         photoDesc: "Tall green pillar next to kids' climbing wall",
         localImage: "images/PXL_20260915_165334788.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80",
@@ -161,7 +257,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Autumn)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165400414.jpg",
+        photoRef: "PXL_20260915_165400414.jpg",
         photoDesc: "Dome weeping umbrella tree on lawn near trampoline",
         localImage: "images/PXL_20260915_165400414.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80",
@@ -178,7 +274,7 @@ const plants = [
         season: "winter",
         seasonLabel: "Winter (Jan - Feb)",
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_...165408451.jpg",
+        photoRef: "PXL_20260915_165408451.jpg",
         photoDesc: "Spreading fruit tree in corner by boundary wall and blue tarp",
         localImage: "images/PXL_20260915_165408451.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=600&q=80",
@@ -197,7 +293,7 @@ const plants = [
         season: "summer",
         seasonLabel: "Mid-Summer (July Only)",
         seasonBadgeClass: "bg-rose-100 text-rose-900 border-rose-300",
-        photoRef: "PXL_...165415026.jpg",
+        photoRef: "PXL_20260915_165415026.jpg",
         photoDesc: "Tall ornamental purple plum beside front brick corner",
         localImage: "images/PXL_20260915_165415026.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=600&q=80",
@@ -214,7 +310,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Top Priority)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165425292.jpg",
+        photoRef: "PXL_20260915_165425292.jpg",
         photoDesc: "Sprawling lavender mound along tarmac edge",
         localImage: "images/PXL_20260915_165425292.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?w=600&q=80",
@@ -231,7 +327,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Windrock Prep)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165431466.jpg",
+        photoRef: "PXL_20260915_165431466.jpg",
         photoDesc: "Tall rose canes with pink blooms in front bed",
         localImage: "images/PXL_20260915_165431466.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80",
@@ -248,7 +344,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Autumn)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165438329.jpg",
+        photoRef: "PXL_20260915_165438329.jpg",
         photoDesc: "Conifer pillar with wild briars shooting through",
         localImage: "images/PXL_20260915_165438329.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
@@ -258,6 +354,23 @@ const plants = [
         videoQuery: "trimming yew column hedge shears"
       },
       {
+        id: "front-young-tree",
+        name: "Young Tree Behind Lavender",
+        latin: "Prunus / Malus",
+        location: "front",
+        season: "winter",
+        seasonLabel: "Winter (Jan - Feb)",
+        seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
+        photoRef: "PXL_20260915_165443090.jpg",
+        photoDesc: "Slender young tree with vertical shoots",
+        localImage: "images/PXL_20260915_165443090.jpg",
+        fallbackImage: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&q=80",
+        tools: "Bypass Secateurs",
+        instructions: "Assess framework in mid-winter. Prune out crossing or competing central leader shoots to train a balanced canopy.",
+        rule: "Formative pruning on young trees sets up structural strength for years to come.",
+        videoQuery: "formative pruning young tree"
+      },
+      {
         id: "front-corkscrew-hazel",
         name: "Corkscrew Hazel",
         latin: "Corylus avellana 'Contorta'",
@@ -265,7 +378,7 @@ const plants = [
         season: "winter",
         seasonLabel: "Winter (Nov - Jan)",
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_...165450925.MP.jpg",
+        photoRef: "PXL_20260915_165450925.MP.jpg",
         photoDesc: "Curled foliage shrub against front boundary wall",
         localImage: "images/PXL_20260915_165450925.MP.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80",
@@ -282,7 +395,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Light Tidy)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165453961.jpg",
+        photoRef: "PXL_20260915_165453961.jpg",
         photoDesc: "Silvery-green shrub growing in mulched bed next to lawn",
         localImage: "images/PXL_20260915_165453961.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
@@ -299,7 +412,7 @@ const plants = [
         season: "winter",
         seasonLabel: "Winter (Nov - Dec Only)",
         seasonBadgeClass: "bg-sky-100 text-sky-900 border-sky-300",
-        photoRef: "PXL_...165459960.jpg",
+        photoRef: "PXL_20260915_165459960.jpg",
         photoDesc: "Weeping tree on front lawn with blue hula hoop",
         localImage: "images/PXL_20260915_165459960.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80",
@@ -316,7 +429,7 @@ const plants = [
         season: "spring",
         seasonLabel: "Spring (March)",
         seasonBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-300",
-        photoRef: "PXL_...165506993.jpg",
+        photoRef: "PXL_20260915_165506993.jpg",
         photoDesc: "Compact rounded hydrangea shrub on front grass",
         localImage: "images/PXL_20260915_165506993.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?w=600&q=80",
@@ -333,7 +446,7 @@ const plants = [
         season: "now",
         seasonLabel: "Act Now (Light Tidy)",
         seasonBadgeClass: "bg-amber-100 text-amber-900 border-amber-300",
-        photoRef: "PXL_...165514917.jpg",
+        photoRef: "PXL_20260915_165514917.jpg",
         photoDesc: "Variegated lollipop standard near front window",
         localImage: "images/PXL_20260915_165514917.jpg",
         fallbackImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&q=80",
@@ -343,3 +456,150 @@ const plants = [
         videoQuery: "shaping standard holly lollipop tree"
       }
     ];
+
+    let currentLoc = 'all';
+    let currentSeason = 'all';
+
+    function getStorageKey(id) {
+      return `prune_status_${id}`;
+    }
+
+    function isCompleted(id) {
+      return localStorage.getItem(getStorageKey(id)) === 'done';
+    }
+
+    function toggleComplete(id) {
+      if (isCompleted(id)) {
+        localStorage.removeItem(getStorageKey(id));
+      } else {
+        localStorage.setItem(getStorageKey(id), 'done');
+      }
+      renderCards();
+      updateProgress();
+    }
+
+    function setLocationFilter(loc) {
+      currentLoc = loc;
+      ['all', 'back', 'front'].forEach(k => {
+        const btn = document.getElementById(`loc-${k}`);
+        if (k === loc) {
+          btn.className = "flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg bg-white text-emerald-800 shadow-sm transition";
+        } else {
+          btn.className = "flex-1 md:flex-initial px-3 md:px-4 py-2 rounded-lg text-slate-600 hover:text-emerald-800 transition";
+        }
+      });
+      renderCards();
+    }
+
+    function setSeasonFilter(season) {
+      currentSeason = season;
+      ['all', 'now', 'winter', 'spring', 'summer'].forEach(s => {
+        const btn = document.getElementById(`season-${s}`);
+        if (s === season) {
+          btn.classList.add('ring-2', 'ring-offset-1', 'ring-slate-800');
+        } else {
+          btn.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800');
+        }
+      });
+      renderCards();
+    }
+
+    function updateProgress() {
+      const completedCount = plants.filter(p => isCompleted(p.id)).length;
+      const total = plants.length;
+      const pct = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+      document.getElementById('progress-text').innerText = `${completedCount} / ${total}`;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('plants-grid');
+      grid.innerHTML = '';
+
+      const filtered = plants.filter(p => {
+        const matchesLoc = (currentLoc === 'all' || p.location === currentLoc);
+        const matchesSeason = (currentSeason === 'all' || p.season === currentSeason);
+        return matchesLoc && matchesSeason;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 font-medium">No plants match the selected filter combination.</div>`;
+        return;
+      }
+
+      filtered.forEach(plant => {
+        const done = isCompleted(plant.id);
+        const card = document.createElement('div');
+        card.className = `plant-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 transition duration-200 flex flex-col justify-between ${done ? 'completed' : ''}`;
+        
+        card.innerHTML = `
+          <div>
+            <!-- Image with automatic fallback -->
+            <div class="relative h-56 bg-slate-100 overflow-hidden">
+              <img 
+                src="${plant.localImage}" 
+                alt="${plant.name}" 
+                class="w-full h-full object-cover"
+                onerror="this.onerror=null; this.src='${plant.fallbackImage}';" 
+              />
+              <span class="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full border ${plant.seasonBadgeClass} shadow-sm backdrop-blur-sm bg-opacity-95">
+                ${plant.seasonLabel}
+              </span>
+              <span class="absolute top-3 right-3 text-xs font-semibold px-2 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
+                ${plant.location === 'back' ? 'Back Garden' : 'Front Garden'}
+              </span>
+              <div class="absolute bottom-2 left-3 right-3 bg-black/80 backdrop-blur-sm text-white text-[11px] px-2.5 py-1 rounded flex items-center justify-between">
+                <span class="font-mono text-emerald-300 font-medium truncate">${plant.photoRef}</span>
+                <span class="truncate ml-2 text-slate-300 text-[10px]">${plant.photoDesc}</span>
+              </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-5">
+              <div class="flex justify-between items-start gap-2 mb-1">
+                <div>
+                  <h3 class="font-bold text-slate-800 text-lg leading-snug">${plant.name}</h3>
+                  <p class="text-xs italic text-slate-400 mb-3">${plant.latin}</p>
+                </div>
+                <button onclick="toggleComplete('${plant.id}')" title="Mark as Done" class="p-2 rounded-xl transition ${done ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'}">
+                  <i class="fa-solid fa-check text-base"></i>
+                </button>
+              </div>
+
+              <div class="space-y-2.5 text-xs">
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="font-bold text-slate-700 block mb-0.5">How to prune:</span>
+                  <p class="text-slate-600 leading-relaxed">${plant.instructions}</p>
+                </div>
+
+                <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200/60 text-amber-900">
+                  <span class="font-bold block mb-0.5"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i>Key Rule:</span>
+                  <p class="leading-relaxed">${plant.rule}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-5 pb-5 pt-2 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-wrench text-slate-400"></i> ${plant.tools}
+            </span>
+            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(plant.videoQuery)}" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline">
+              <i class="fa-brands fa-youtube text-base"></i> Watch Guide
+            </a>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    renderCards();
+    updateProgress();
+  </script>
+</body>
+</html>
